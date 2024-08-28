@@ -6,7 +6,7 @@
 extern FILE *stdin;		/* Standard input stream.  */
 extern FILE *stdout;		/* Standard output stream.  */
 
-int test();
+int _main();
 
 int main()
 {
@@ -16,7 +16,7 @@ int main()
     {
         printf("file err");
     }
-    test();
+    _main();
     fclose(stdin);
     fclose(stdout);
 }
@@ -47,7 +47,7 @@ void increment_near(int row, int column)
     }
 }
 
-int test()
+int _main()
 {
     scanf("%d %d %d", &row_count, &column_count, &mine_count);
     for (int i = 0; i < mine_count; i++)
