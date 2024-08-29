@@ -4,7 +4,7 @@ project(funny-queue C)
 
 add_executable(${CMAKE_PROJECT_NAME} src/startup.c src/funny-queue.c)
 
-set_source_files_properties(src/funny-queue.c PROPERTIES COMPILE_FLAGS -Dmain=testmain)
+include_directories(src)
 
 enable_testing()
 add_test(NAME run-funny-queue COMMAND funny-queue)

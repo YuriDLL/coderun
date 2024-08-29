@@ -1,3 +1,4 @@
+#include "fakeio.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,6 +20,7 @@ enum
 typedef struct
 {
     uint32_t value;
+    void *prev_elem;
     void *next_elem;
 } element_t;
 
@@ -34,6 +36,9 @@ static uint32_t list_pop(list_t *list, bool from_start);
 static void calc_max(list_t *list);
 static void list_xor(list_t *list, uint32_t xor_value);
 static void list_show(list_t *list);
+static void list_swap(list_t *list, uint32_t index1, uint32_t index2);
+static element_t* get_element(list_t *list, int32_t index);
+static uint32_t length(list_t *list);
 
 int main()
 {
@@ -58,11 +63,11 @@ int main()
         }
         else if (cmd == CMD_DELETE_START)
         {
-            printf("rem:%d\n", list_pop(&list, true));
+            printf("%d\n", list_pop(&list, true));
         }
         else if (cmd == CMD_DELETE_END)
         {
-            printf("%d\n", list_pop(&list, true));
+            printf("%d\n", list_pop(&list, false));
         }
         else if (cmd == CMD_MAX)
         {
@@ -169,43 +174,54 @@ static void calc_max(list_t *list)
 
 static void list_xor(list_t *list, uint32_t xor_value)
 {
-    uint32_t max = list->first_elem->value;
-    element_t *elem = list->first_elem;
-
-    for (uint32_t i=0; i < UINT32_MAX; i++)
+    for(uint32_t i=0; i < length(list); i++)
     {
-        if (elem == NULL)
+        if ((i ^ xor_value) > i)
         {
-            break;
+            list_swap(list, i, i ^ xor_value);
         }
-        elem->value ^= xor_value;
     }
-
-    while (next_elem != NULL)
-    {
-        next_elem->value ^= xor_value;
-        if(max < next_elem->value)
-        {
-            max = next_elem->value;
-        }
-        next_elem = next_elem->next_elem;
-    }
-    list->max_value = max;
 }
 
 static void list_show(list_t *list)
 {
-    element_t *next_elem = list->first_elem;
-    int i = 0;
-    while (next_elem != NULL)
+    for (int i=0; i < length(list); i++)
     {
-        i++;
-        if (i > 10)
-        {
-            return;
-        }
-        printf("[%d]=%d\n",i , next_elem->value);
-
-        next_elem = next_elem->next_elem;
+        element_t *elem = get_element(list, i);
+        printf("[%d]=%d\n",i , elem->value);
     }
+}
+
+static void list_swap(list_t *list, uint32_t index1, uint32_t index2)
+{
+    element_t* e1 = get_element(list, index1);
+    element_t* e2 = get_element(list, index2);
+    uint32_t swap_value = {0};
+    swap_value = e1->value;
+    e1->value = e2->value;
+    e2->value = swap_value;
+}
+
+static element_t* get_element(list_t *list, int32_t index)
+{
+    element_t *elem = list->first_elem;
+    for(uint32_t i=0; i < index; i++)
+    {
+        if (elem == NULL)
+            break;
+        elem = elem->next_elem;
+    }
+    return elem;
+}
+
+static uint32_t length(list_t *list)
+{
+    element_t *elem = list->first_elem;
+    uint32_t length = 0;
+    while(elem != NULL)
+    {
+        length++;
+        elem = elem->next_elem;
+    }
+    return length;
 }
